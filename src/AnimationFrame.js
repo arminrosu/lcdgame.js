@@ -8,44 +8,26 @@ const AnimationFrame = function (lcdgame) {
 	// save reference to game object
 	this.lcdgame = lcdgame;
 	this.raftime = null;
+	this.rafId = null;
 };
 
 AnimationFrame.prototype = {
 
 	start: function () {
-		var vendors = [
-			'ms',
-			'moz',
-			'webkit',
-			'o'
-		];
+		this.animationLoop = (time) => {
+			return this.updateAnimFrame(time);
+		};
 
-		for (var x = 0; x < vendors.length && !window.requestAnimationFrame; x++)
-		{
-			window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
-			window.cancelAnimationFrame = window[vendors[x] + 'CancelAnimationFrame'];
-		}
-
-		// cannot use requestAnimationFrame for whatever reason, fall back on `setTimeout`
-		if (!window.requestAnimationFrame)
-		{
-			this.animationLoop = () => {
-				return this.updateSetTimeout();
-			};
-
-			window.setTimeout(this.animationLoop, 0);
-		}
-		else
-		{
-
-			this.animationLoop = (time) => {
-				return this.updateAnimFrame(time);
-			};
-
-			window.requestAnimationFrame(this.animationLoop);
-		}
+		this.rafId = window.requestAnimationFrame(this.animationLoop);
 	},
 
+	/**
+	 * Trigger a timer method every AnimationFrame.
+	 *
+	 * @WARNING: requestAnimationFrame is paused if the tab is not active. All events are executed after the tab becomes active again, resulting in a "wormhole" effect.
+	 *
+	 * @param {DOMHighResTimeStamp} rafTime
+	 */
 	updateAnimFrame: function (rafTime) {
 		// check if switch to pending new state
 		this.lcdgame.state.checkSwitch();
@@ -54,18 +36,8 @@ AnimationFrame.prototype = {
 		this.raftime = Math.floor(rafTime);
 		this.lcdgame.updateloop(this.raftime);
 
-		window.requestAnimationFrame(this.animationLoop);
-	},
-
-	updateSetTimeout: function () {
-		// check if switch to pending new state
-		this.lcdgame.state.checkSwitch();
-
-		this.raftime = Date.now();
-		this.lcdgame.updateloop(this.raftime);
-
-		var ms = Math.floor(1000.0 / 60.0);
-		window.setTimeout(this.animationLoop, ms);
+		window.cancelAnimationFrame(this.rafId);
+		this.rafId = window.requestAnimationFrame(this.animationLoop);
 	}
 };
 

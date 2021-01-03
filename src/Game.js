@@ -187,6 +187,15 @@ Game.prototype = {
 	// -------------------------------------
 	// timers and game loop
 	// -------------------------------------
+
+	/**
+	 * Register a callback to be executed every `ms` milliseconds.
+	 *
+	 * @param {object} context - Game instance.
+	 * @param {function} callback - Function callback to execute.
+	 * @param {number} ms - Millisecond interval to execute this callback.
+	 * @param {boolean} waitfirst - Execute callback on registration or after first `ms` interval has passed.
+	 */
 	addtimer: function(context, callback, ms, waitfirst = true) {
 
 		// after .start() do instantly start callbacks (true), or wait the first time (false), so:
@@ -201,6 +210,11 @@ Game.prototype = {
 		return tim;
 	},
 
+	/**
+	 * Stop and de-register all Timers.
+	 *
+	 * @private
+	 */
 	cleartimers: function() {
 		// clear all timers
 		for (var t=0; t < this.timers.length; t++) {
@@ -210,6 +224,12 @@ Game.prototype = {
 		this.timers = [];
 	},
 
+	/**
+	 * Execute callbacks.
+	 *
+	 * @private
+	 * @param {Number} timestamp - Current timestamp, in milliseconds.
+	 */
 	updateloop: function(timestamp) {
 		// check all timers
 		for (var t=0; t < this.timers.length; t++) {
