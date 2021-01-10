@@ -232,8 +232,7 @@ Game.prototype = {
 	 * Execute callbacks.
 	 *
 	 * @private
-	 * @param {Number} timestamp - Milliseconds since time origin.
-	 * @see https://developer.mozilla.org/en-US/docs/Web/API/DOMHighResTimeStamp
+	 * @param {Number} timestamp - Date.now()
 	 */
 	updateLoop: function(timestamp) {
 		// check all timers
