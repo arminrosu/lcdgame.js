@@ -35,18 +35,6 @@ Timer.prototype = {
 
 	// update each frame
 	update: function(timestamp) {
-
-		//debugger;
-		var varname = this.callback.name;
-		//for (var key in this.context) {
-		//	if (this.context.hasOwnProperty(key)) {
-		//		if (key.indexOf("timer") >= 0) {
-		//			varname = key;
-		//			break;
-		//		};
-		//	};
-		//};
-
 		var delta = timestamp - this.lasttime;
 
 		// timer tick
@@ -84,7 +72,7 @@ Timer.prototype = {
 		this.counter = 0;
 		this.max = max;
 		//this.lasttime = 0;
-		this.lasttime = (this.context.lcdgame.raf.raftime || 0);
+		this.lasttime = (this.context.lcdgame.time || 0);
 		// start immediately?
 		if (this.waitfirst == false) {
 			this.lasttime -= this.interval;
@@ -99,7 +87,7 @@ Timer.prototype = {
 
 	// unpause the timer; continue but do not reset the counter
 	unpause: function() {
-		this.lasttime = (this.context.lcdgame.raf.raftime || 0);
+		this.lasttime = (this.context.lcdgame.time || 0);
 		if (this.waitfirst == false) {
 			this.lasttime -= this.interval;
 		}

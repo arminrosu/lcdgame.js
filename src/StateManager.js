@@ -17,6 +17,11 @@ const StateManager = function (lcdgame) {
 
 StateManager.prototype = {
 
+	/**
+	 *
+	 * @param {string} key
+	 * @param {object} state - Game Mode
+	 */
 	add: function (key, state) {
 		//state.game = this.game;
 		this.states[key] = new state(this.lcdgame);
@@ -27,7 +32,6 @@ StateManager.prototype = {
 	},
 
 	start: function (key) {
-
 		this.lcdgame.cleartimers();
 
 		if (this._currentState) {
@@ -40,7 +44,6 @@ StateManager.prototype = {
 	},
 
 	currentState: function () {
-
 		if (this._currentState) {
 			return this.states[this._currentState];
 		}
