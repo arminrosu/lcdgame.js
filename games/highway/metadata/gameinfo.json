@@ -1,22 +1,22 @@
 {
-	"gameinfo": {
-		"device": {
-			"title": "Highway",
-			"model": "737",
-			"manufacturer": "Mini Arcade",
-			"releasedate": "1988",
-			"type": "LCD"
-		},
-		"simulation": {
-			"program": "Bas de Reuver",
-			"photoedit": "Bas de Reuver",
-			"deviceprovided": "r.vdveen"
-		},
-		"gametypes": [
-			"game 1", "game 2"
-		],
-		"instructions": {
-			"en": "Avoid obstacles, pick up hitchhiker on the left and drop them off at sign on the right. Drop off 3 hitchhikers for a bonus game, get 3 identical numers for bonus.\n\nStart the game by pressing [Mode] to select game mode,\nthen [< Left] or [Right >] to start the game.\nYou can also press keyboard cursors left and right to move."
-		}
-	}
+  "gameinfo": {
+    "device": {
+      "title": "Highway",
+      "model": "737",
+      "manufacturer": "Mini Arcade",
+      "releasedate": "1988",
+      "type": "LCD"
+    },
+    "simulation": {
+      "program": "Bas de Reuver",
+      "photoedit": "Bas de Reuver",
+      "deviceprovided": "r.vdveen"
+    },
+    "gametypes": [
+      "game 1", "game 2"
+    ],
+    "instructions": {
+      "en": "Avoid obstacles, pick up hitchhiker on the left and drop them off at sign on the right. Drop off 3 hitchhikers for a bonus game, get 3 identical numers for bonus.\n\nStart the game by pressing [Mode] to select game mode,\nthen [< Left] or [Right >] to start the game.\nYou can also press keyboard cursors left and right to move."
+    }
+  }
 }

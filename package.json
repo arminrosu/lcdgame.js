@@ -1,49 +1,49 @@
 {
-	"name": "super-lcdgame.js",
-	"version": "1.0.0",
-	"private": true,
-	"description": "LCD game library in html5/javascript, to recreate simulations of 80s Game & Watch by Nintendo and other electronic handheld games like Tandy, Sunwing, Mini Arcade etc.",
-	"keywords": [
-		"lcd",
-		"game",
-		"80s",
-		"handheld"
-	],
-	"homepage": "https://github.com/arminrosu/super-lcdgame.js#readme",
-	"bugs": {
-		"url": "https://github.com/arminrosu/super-lcdgame.js/issues"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/arminrosu/super-lcdgame.js.git"
-	},
-	"license": "SEE LICENSE IN LICENSE.md",
-	"author": {
-		"name": "Armin Roșu",
-		"email": "hello@armin.ro",
-		"url": "https://armin.ro"
-	},
-	"contributors": [
-		{
-			"name": "Bas de Reuver",
-			"email": "bdr1976@gmail.com",
-			"url": "http://bdrgames.nl"
-		}
-	],
-	"main": "bin/lcdgame.js",
-	"scripts": {
-		"build": "esbuild src/clock.ts src/lcdgame.js --bundle --banner=\"/*! LCD game JavaScript library -- by BdR 2018 */\" --minify --sourcemap --target=es2020 --outdir=bin",
-		"lint": "eslint games src --ext .js,.ts",
-		"lint:fix": "npm run lint -- --fix",
-		"serve:local": "serve ./",
-		"test": "echo \"Error: no test specified\" && exit 1"
-	},
-	"devDependencies": {
-		"@typescript-eslint/eslint-plugin": "^4.15.0",
-		"@typescript-eslint/parser": "^4.15.0",
-		"esbuild": "^0.8.44",
-		"eslint": "^7.20.0",
-		"serve": "^11.3.2",
-		"typescript": "^4.1.5"
-	}
+  "name": "super-lcdgame.js",
+  "version": "1.0.0",
+  "private": true,
+  "description": "LCD game library in html5/javascript, to recreate simulations of 80s Game & Watch by Nintendo and other electronic handheld games like Tandy, Sunwing, Mini Arcade etc.",
+  "keywords": [
+    "lcd",
+    "game",
+    "80s",
+    "handheld"
+  ],
+  "homepage": "https://github.com/arminrosu/super-lcdgame.js#readme",
+  "bugs": {
+    "url": "https://github.com/arminrosu/super-lcdgame.js/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arminrosu/super-lcdgame.js.git"
+  },
+  "license": "SEE LICENSE IN LICENSE.md",
+  "author": {
+    "name": "Armin Roșu",
+    "email": "hello@armin.ro",
+    "url": "https://armin.ro"
+  },
+  "contributors": [
+    {
+      "name": "Bas de Reuver",
+      "email": "bdr1976@gmail.com",
+      "url": "http://bdrgames.nl"
+    }
+  ],
+  "main": "bin/lcdgame.js",
+  "scripts": {
+    "build": "esbuild src/clock.ts src/lcdgame.js --bundle --banner=\"/*! LCD game JavaScript library -- by BdR 2018 */\" --minify --sourcemap --target=es2020 --outdir=bin",
+    "lint": "eslint games src --ext .js,.ts",
+    "lint:fix": "npm run lint -- --fix",
+    "serve:local": "serve ./",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.15.0",
+    "@typescript-eslint/parser": "^4.15.0",
+    "esbuild": "^0.8.44",
+    "eslint": "^7.20.0",
+    "serve": "^11.3.2",
+    "typescript": "^4.1.5"
+  }
 }
