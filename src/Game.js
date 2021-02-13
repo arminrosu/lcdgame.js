@@ -4,13 +4,14 @@
 import { LCDGAME_VERSION } from './System';
 import { displayInfobox, renderInfoBox } from './Menu';
 import HighScores, { SCORE_HTML } from './Highscores';
-import AnimationFrame from './AnimationFrame';
 import Sounds from './Sounds';
 import StateManager from './StateManager';
 import Timer from './Timer';
 import { isTouchDevice, randomInteger, request } from './utils';
 import { addSVG, BUTTON_CLASSNAME, setDigitVisibility, setShapeVisibility, setShapesVisibility } from './svg';
 import { getKeyMapping, normalizeButtons } from './buttons';
+
+const WORKER_FILENAME = '/bin/clock.js';
 
 const CONTAINER_HTML =
 	'<div id="container" class="container">' +
@@ -57,9 +58,6 @@ const Game = function (configfile, metadatafile = "metadata/gameinfo.json") {
 
 	// state manager
 	this.state = new StateManager(this);
-
-	// request animation frame
-	this.raf = new AnimationFrame(this);
 
 	this.digitMap = new Map();
 	// @NOTE: change this object to add / remove custom key bindings
@@ -159,6 +157,14 @@ Game.prototype = {
 		await this.loadConfig(configfile);
 		await this.loadMetadata(metadatafile);
 
+		this.clock = new Worker(WORKER_FILENAME);
+		this.clock.onmessage = (event) => {
+			const time = event.data.time;
+			this.time = time;
+			this.state.checkSwitch();
+			this.updateLoop(time);
+		};
+
 		// prepare sounds
 		this.sounds = new Sounds(this.gamedata.sounds);
 
@@ -179,14 +185,21 @@ Game.prototype = {
 
 		displayInfobox();
 
-		this.raf.start();
-
 		console.log("lcdgame.js v" +  LCDGAME_VERSION + " :: start");
 	},
 
 	// -------------------------------------
 	// timers and game loop
 	// -------------------------------------
+
+	/**
+	 * Register a callback to be executed every `ms` milliseconds.
+	 *
+	 * @param {object} context - Game instance.
+	 * @param {function} callback - Function callback to execute.
+	 * @param {number} ms - Millisecond interval to execute this callback.
+	 * @param {boolean} waitfirst - Execute callback on registration or after first `ms` interval has passed.
+	 */
 	addtimer: function(context, callback, ms, waitfirst = true) {
 
 		// after .start() do instantly start callbacks (true), or wait the first time (false), so:
@@ -201,6 +214,11 @@ Game.prototype = {
 		return tim;
 	},
 
+	/**
+	 * Stop and de-register all Timers.
+	 *
+	 * @private
+	 */
 	cleartimers: function() {
 		// clear all timers
 		for (var t=0; t < this.timers.length; t++) {
@@ -210,7 +228,13 @@ Game.prototype = {
 		this.timers = [];
 	},
 
-	updateloop: function(timestamp) {
+	/**
+	 * Execute callbacks.
+	 *
+	 * @private
+	 * @param {Number} timestamp - Date.now()
+	 */
+	updateLoop: function(timestamp) {
 		// check all timers
 		for (var t=0; t < this.timers.length; t++) {
 			if (this.timers[t].enabled) {
