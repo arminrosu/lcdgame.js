@@ -1,11 +1,12 @@
 // LCD game JavaScript library
 // Bas de Reuver (c)2018
 
+import { version } from '../package.json';
 import { displayScorebox, hideScorebox } from './Highscores';
 import { displayInfobox, hideInfobox } from './Menu';
 import Game from './Game';
 
-export const LCDGAME_VERSION = "0.3.4";
+export const LCDGAME_VERSION = version;
 
 /**
  * @namespace LCDGame

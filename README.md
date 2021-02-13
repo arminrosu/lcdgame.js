@@ -4,7 +4,7 @@ This project is a [fork](https://github.com/BdR76/lcdgame.js/pull/7#issuecomment
 
 ## Run
 
-You need to build the sources using `npm run build` and run a webserver using `npm run serve:local`.
+You need to build the sources using `yarn build` and run a webserver using `yarn serve:local`.
 
 The original games can also be played online on [Bas de Reuver's website](http://bdrgames.nl/lcdgames/).
 
