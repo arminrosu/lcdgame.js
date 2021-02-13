@@ -1,7 +1,7 @@
 // LCD game JavaScript library
 // Bas de Reuver (c)2018
 
-import { Button, ButtonType } from "./@types";
+import { Button, ButtonType } from './@types';
 
 /**
  * Get Map of { KeyboardEvent.key: Button.name } from configured Buttons.
@@ -9,14 +9,14 @@ import { Button, ButtonType } from "./@types";
  * @param {Button[]} buttons
  * @returns {object}
  */
-export function getKeyMapping(buttons:Button[]):Record<string, string> {
+export function getKeyMapping (buttons:Button[]):Record<string, string> {
   const keyMapping:Record<string, string> = {};
   // map metadata button name to KeyboardEvent.key
   const nameMap:Record<string, string> = {
-    'up': 'ArrowUp',
-    'down': 'ArrowDown',
-    'left': 'ArrowLeft',
-    'right': 'ArrowRight',
+    up: 'ArrowUp',
+    down: 'ArrowDown',
+    left: 'ArrowLeft',
+    right: 'ArrowRight'
   };
 
   buttons.forEach((button) => {
@@ -37,7 +37,7 @@ export function getKeyMapping(buttons:Button[]):Record<string, string> {
  * @param {Button[]} buttons
  * @returns {Button[]}
  */
-export function normalizeButtons(buttons:Button[]):Button[] {
+export function normalizeButtons (buttons:Button[]):Button[] {
   return buttons.map((button) => {
     // e.g. DPAD:
     // {"name":"dpad","type":"dpad","frames":["dpad_up","dpad_down","dpad_left","dpad_right"],"defaultkeys":["up","down","left","right","w","s","a","d"]},

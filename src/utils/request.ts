@@ -1,6 +1,6 @@
-export default function request(path) {
+export default function request (path:string):Promise<any> {
   return new Promise((resolve, reject) => {
-    var xhrCallback = function(){
+    const xhrCallback = function () {
       if (xhr.readyState === XMLHttpRequest.DONE) {
         if ((xhr.status === 200) || (xhr.status === 0)) {
           resolve(JSON.parse(xhr.responseText));
@@ -10,10 +10,10 @@ export default function request(path) {
       }
     };
 
-    var xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = xhrCallback.bind(this);
+    const xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = xhrCallback;
 
-    xhr.open("GET", path, true);
+    xhr.open('GET', path, true);
     xhr.send();
   });
 }

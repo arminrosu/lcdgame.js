@@ -1,4 +1,4 @@
-import { Button, ButtonType, DigitGroup, Frame, GameConfig, Sequence } from "./@types";
+import { Button, ButtonType, DigitGroup, Frame, GameConfig, Sequence } from './@types';
 
 export const BUTTON_CLASSNAME = 'svgButton';
 const SHAPE_CLASSNAME = 'svgShape';
@@ -8,7 +8,7 @@ interface AttributesObject {
   [key: string]: string | number;
 }
 
-function fetchImage(url:string):Promise<HTMLImageElement> {
+function fetchImage (url:string):Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const image = new Image();
     image.onerror = (error):void => {
@@ -21,28 +21,28 @@ function fetchImage(url:string):Promise<HTMLImageElement> {
   });
 }
 
-function getButtonDirection(name:string):string {
+function getButtonDirection (name:string):string {
   return name.substring(name.lastIndexOf('_') + 1);
 }
 
-function getClipPathId(name:string):string {
+function getClipPathId (name:string):string {
   return `svg-clippath-${name}`;
 }
 
-function getDigitFrameId(groupName:string, positionIndex:number|string, value:string):string {
+function getDigitFrameId (groupName:string, positionIndex:number|string, value:string):string {
   return `svg-frame-${groupName}-${positionIndex.toString()}-${value}`;
 }
 
-function getDigitFrameNames(digits:DigitGroup[]):string[] {
+function getDigitFrameNames (digits:DigitGroup[]):string[] {
   return digits.map(digit => [...digit.frames, ...digit.locations]).flat();
 }
 
-function getFrameNames(list:(Button|Sequence)[]):string[] {
+function getFrameNames (list:(Button|Sequence)[]):string[] {
   return list.map(listItem => listItem.frames).flat();
 }
 
 const framesMap:Map<string, Frame> = new Map();
-function getFramesMap(frames: Frame[]): Map<string, Frame> {
+function getFramesMap (frames: Frame[]): Map<string, Frame> {
   if (framesMap.size === 0) {
     frames.forEach(frame => {
       framesMap.set(frame.filename, frame);
@@ -51,18 +51,18 @@ function getFramesMap(frames: Frame[]): Map<string, Frame> {
   return framesMap;
 }
 
-function getFrameId(name:string):string {
+function getFrameId (name:string):string {
   return `svg-frame-${name}`;
 }
 
-function renderAttributes(attributes:AttributesObject):string {
+function renderAttributes (attributes:AttributesObject):string {
   return Object
     .entries(attributes)
     .map(([key, value]) => `${key}="${value}"`)
     .join(' ');
 }
 
-function renderButtons(frames:Frame[], spriteImage:HTMLImageElement, buttons: Button[]) {
+function renderButtons (frames:Frame[], spriteImage:HTMLImageElement, buttons: Button[]) {
   const buttonMap = new Map<string, Button>();
   buttons.forEach(button => {
     return button.frames.forEach(frameName => buttonMap.set(frameName, button));
@@ -78,9 +78,9 @@ function renderButtons(frames:Frame[], spriteImage:HTMLImageElement, buttons: Bu
     const attributes = {
       // @WARNING This uses the _button name_, not the _shape name_ as an ID.
       // The game files use this as an ID.
-      'id': getFrameId(button.name),
-      'class': `${BUTTON_CLASSNAME} ${SHAPE_CLASSNAME}`,
-      'data-name': button.name,
+      id: getFrameId(button.name),
+      class: `${BUTTON_CLASSNAME} ${SHAPE_CLASSNAME}`,
+      'data-name': button.name
     };
 
     return `
@@ -92,7 +92,7 @@ function renderButtons(frames:Frame[], spriteImage:HTMLImageElement, buttons: Bu
   }).join('');
 }
 
-function renderClipPath(frame:Frame):string {
+function renderClipPath (frame:Frame):string {
   return `
     <clipPath id="${getClipPathId(frame.filename)}">
       <rect
@@ -105,7 +105,7 @@ function renderClipPath(frame:Frame):string {
   `;
 }
 
-function renderDigitGroups(config:GameConfig, spriteImage: HTMLImageElement):string {
+function renderDigitGroups (config:GameConfig, spriteImage: HTMLImageElement):string {
   const map = getFramesMap(config.frames);
 
   return config.digits.map(digitGroup => {
@@ -125,20 +125,20 @@ function renderDigitGroups(config:GameConfig, spriteImage: HTMLImageElement):str
         }
 
         return renderImage(digitFrame, spriteImage, {
-          'id': getDigitFrameId(digitGroup.name, locationIndex, digitFrameValue),
-          'class': SHAPE_CLASSNAME,
+          id: getDigitFrameId(digitGroup.name, locationIndex, digitFrameValue),
+          class: SHAPE_CLASSNAME,
           'data-digit-group': digitGroup.name,
           'data-digit-position': locationIndex,
           'data-digit-value': digitFrameValue,
-          'transform': `translate(${locationFrame.spriteSourceSize.x - digitFrame.frame.x},${locationFrame.spriteSourceSize.y - digitFrame.frame.y})`,
+          transform: `translate(${locationFrame.spriteSourceSize.x - digitFrame.frame.x},${locationFrame.spriteSourceSize.y - digitFrame.frame.y})`
         });
       });
     }).flat(2).join('\n') + '</g>';
   }).join('\n');
 }
 
-function renderHitBox(frame:Frame, type:ButtonType):string {
-  const { x, y, w, h} = frame.spriteSourceSize;
+function renderHitBox (frame:Frame, type:ButtonType):string {
+  const { x, y, w, h } = frame.spriteSourceSize;
   let offsetX = x;
   let offsetY = y;
   let width = w;
@@ -150,17 +150,17 @@ function renderHitBox(frame:Frame, type:ButtonType):string {
     width = Math.floor(w / 3);
 
     switch (direction) {
-      case "left":
+      case 'left':
         offsetY += height;
         break;
-      case "right":
+      case 'right':
         offsetX += 2 * width;
         offsetY += height;
         break;
-      case "up":
+      case 'up':
         offsetX += width;
         break;
-      case "down":
+      case 'down':
         offsetX += width;
         offsetY += 2 * height;
         break;
@@ -171,7 +171,7 @@ function renderHitBox(frame:Frame, type:ButtonType):string {
     const direction = getButtonDirection(frame.filename);
     height = Math.floor(h / 2);
 
-    if (direction === "down") {
+    if (direction === 'down') {
       offsetY += height;
     }
   }
@@ -179,22 +179,22 @@ function renderHitBox(frame:Frame, type:ButtonType):string {
   return `<rect x="0" y="0" width="${width}" height="${height}" transform="translate(${offsetX}, ${offsetY})" />`;
 }
 
-function renderImage(frame: Frame, spriteImage: HTMLImageElement, attributes = {} as AttributesObject):string {
+function renderImage (frame: Frame, spriteImage: HTMLImageElement, attributes = {} as AttributesObject):string {
   const attr = {
     'clip-path': `url(#${getClipPathId(frame.filename)})`,
-    'height': spriteImage.height,
-    'href': spriteImage.src,
-    'transform': `translate(${frame.spriteSourceSize.x - frame.frame.x},${frame.spriteSourceSize.y - frame.frame.y})`,
-    'width': spriteImage.width,
-    'x': "0",
-    'y': "0",
-    ...attributes,
+    height: spriteImage.height,
+    href: spriteImage.src,
+    transform: `translate(${frame.spriteSourceSize.x - frame.frame.x},${frame.spriteSourceSize.y - frame.frame.y})`,
+    width: spriteImage.width,
+    x: '0',
+    y: '0',
+    ...attributes
   };
 
   return `<image ${renderAttributes(attr)} />`;
 }
 
-function renderSequenceFrame(config:GameConfig, frameName: string, spriteImage: HTMLImageElement):string {
+function renderSequenceFrame (config:GameConfig, frameName: string, spriteImage: HTMLImageElement):string {
   const map = getFramesMap(config.frames);
 
   const frame = map.get(frameName);
@@ -208,7 +208,7 @@ function renderSequenceFrame(config:GameConfig, frameName: string, spriteImage: 
   });
 }
 
-function renderSequences(config:GameConfig, spriteImage: HTMLImageElement):string {
+function renderSequences (config:GameConfig, spriteImage: HTMLImageElement):string {
   return config.sequences.map(sequence => {
     return `
       <g data-sequence-name="${sequence.name}">
@@ -218,7 +218,7 @@ function renderSequences(config:GameConfig, spriteImage: HTMLImageElement):strin
   }).join('\n');
 }
 
-async function render(config:GameConfig):Promise<string> {
+async function render (config:GameConfig):Promise<string> {
   const backgroundImage = await fetchImage(config.imgback);
   const spriteImage = await fetchImage(config.imgshapes);
 
@@ -254,7 +254,7 @@ async function render(config:GameConfig):Promise<string> {
   return string;
 }
 
-export async function addSVG(config:GameConfig):Promise<void> {
+export async function addSVG (config:GameConfig):Promise<void> {
   const html = await render(config);
   const svg = document.getElementById('svg');
   if (svg) {
@@ -264,7 +264,7 @@ export async function addSVG(config:GameConfig):Promise<void> {
   }
 }
 
-function setElementVisibility(id:string, isVisible:boolean):void {
+function setElementVisibility (id:string, isVisible:boolean):void {
   const element = document.getElementById(id);
 
   if (!element) {
@@ -277,12 +277,12 @@ function setElementVisibility(id:string, isVisible:boolean):void {
   }
 }
 
-export function setShapeVisibility(name:string, isVisible:boolean):void {
+export function setShapeVisibility (name:string, isVisible:boolean):void {
   const id = getFrameId(name);
   setElementVisibility(id, isVisible);
 }
 
-export function setShapesVisibility(isVisible:boolean):void {
+export function setShapesVisibility (isVisible:boolean):void {
   document.querySelectorAll(`.${SHAPE_CLASSNAME}`).forEach(element => {
     if (isVisible) {
       element.classList.add(VISIBLE_SHAPE_CLASSNAME);
@@ -292,7 +292,7 @@ export function setShapesVisibility(isVisible:boolean):void {
   });
 }
 
-export function setDigitVisibility(groupName:string, position: number, value:string, isVisible: boolean):void {
+export function setDigitVisibility (groupName:string, position: number, value:string, isVisible: boolean):void {
   const id = getDigitFrameId(groupName, position, value);
   // hide previously visible digit
   document.querySelectorAll(`.${SHAPE_CLASSNAME}.${VISIBLE_SHAPE_CLASSNAME}[data-digit-group="${groupName}"][data-digit-position="${position.toString()}"]:not([data-digit-value="${value}"])`).forEach(element => {

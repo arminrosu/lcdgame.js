@@ -1,7 +1,7 @@
 // LCD game JavaScript library
 // Bas de Reuver (c)2018
 
-const Sounds = function Sounds(soundsArray) {
+const Sounds = function Sounds (soundsArray) {
   this.map = new Map();
   soundsArray.forEach(sound => {
     sound.audio = new Audio(sound.filename);
@@ -12,7 +12,7 @@ const Sounds = function Sounds(soundsArray) {
 };
 
 Sounds.prototype = {
-  mute: function(isMuted = !this.muted) {
+  mute: function (isMuted = !this.muted) {
     this.muted = isMuted;
 
     this.map.forEach(sound => {
@@ -20,7 +20,7 @@ Sounds.prototype = {
     });
   },
 
-  play: function(effectName) {
+  play: function (effectName) {
     if (this.muted || !this.map.has(effectName)) {
       return;
     }

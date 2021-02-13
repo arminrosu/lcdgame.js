@@ -15,18 +15,17 @@ const WORKER_FILENAME = '/bin/clock.js';
 
 const CONTAINER_HTML =
   '<div id="container" class="container">' +
-  '	<div id="svg" class="svgContainer"></div>' +
-  '	<div class="menu">' +
-  '		<a class="mybutton" onclick="LCDGame.displayScorebox();">highscores</a>' +
-  '		<a class="mybutton" onclick="LCDGame.displayInfobox();">help</a>' +
-  '	</div>' +
+  '  <div id="svg" class="svgContainer"></div>' +
+  '  <div class="menu">' +
+  '    <a class="mybutton" onclick="LCDGame.displayScorebox();">highscores</a>' +
+  '    <a class="mybutton" onclick="LCDGame.displayInfobox();">help</a>' +
+  '  </div>' +
   '</div>';
 
 // -------------------------------------
 // game object
 // -------------------------------------
-const Game = function (configfile, metadatafile = "metadata/gameinfo.json") {
-
+const Game = function (configfile, metadatafile = 'metadata/gameinfo.json') {
   this.gamedata = {};
   this.score = 0;
   this.gametype = 0;
@@ -35,26 +34,14 @@ const Game = function (configfile, metadatafile = "metadata/gameinfo.json") {
   this.buttonpress = 0;
   this.playtimestart = null;
 
-  // site lock, enable for no hotlinking
-  /*
-  var domain = document.domain;
-  siteLock = false;
-  var siteLock = (domain.indexOf("bdrgames.nl") == -1);
-  if (siteLock) {
-    document.write('To play LCD game simulations, please visit: <a href="http://www.bdrgames.nl/lcdgames/">http://www.bdrgames.nl/lcdgames/</a>');
-    console.log('%c To play LCD game simulations, please visit: http://www.bdrgames.nl/lcdgames/', 'background: #000; color: #0f0'); // cool hax0r colors ;)
-    return;
-  };
-  */
-
   // create elements and add to document
-  var str =
+  const str =
     CONTAINER_HTML +
     SCORE_HTML;
 
   document.write(str);
 
-  this.scorecontent = document.getElementById("scorecontent");
+  this.scorecontent = document.getElementById('scorecontent');
 
   // state manager
   this.state = new StateManager(this);
@@ -76,12 +63,12 @@ Game.prototype = {
   // -------------------------------------
   // load a game configuration file
   // -------------------------------------
-  loadConfig: async function(path) {
+  loadConfig: async function (path) {
     try {
       const data = await request(path);
       await this.onConfigLoad(data);
     } catch (error) {
-      console.log("** ERROR ** lcdgame.js - onConfigError: error loading json file");
+      console.log('** ERROR ** lcdgame.js - onConfigError: error loading json file');
       console.error(error);
     }
   },
@@ -89,7 +76,7 @@ Game.prototype = {
   // -------------------------------------
   // start game
   // -------------------------------------
-  onConfigLoad: async function(data) {
+  onConfigLoad: async function (data) {
     data.buttons = normalizeButtons(data.buttons);
 
     this.gamedata = data;
@@ -104,7 +91,7 @@ Game.prototype = {
         value: false,
         valprev: false,
         // add type
-        type: "shape",
+        type: 'shape'
       });
     });
 
@@ -114,7 +101,7 @@ Game.prototype = {
     });
 
     // prepare digits
-    for (var d = 0; d < this.gamedata.digits.length; d++) {
+    for (let d = 0; d < this.gamedata.digits.length; d++) {
       const digitGroup = data.digits[d];
       this.digitMap.set(digitGroup.name, digitGroup);
     }
@@ -126,22 +113,22 @@ Game.prototype = {
   // -------------------------------------
   // load a metadata file
   // -------------------------------------
-  loadMetadata: async function(path) {
+  loadMetadata: async function (path) {
     try {
       const data = await request(path);
       renderInfoBox(data);
 
       // get info from metadata
-      var title = data.gameinfo.device.title;
-      var gametypes = data.gameinfo.gametypes;
+      const title = data.gameinfo.device.title;
+      const gametypes = data.gameinfo.gametypes;
 
-      this.gametype = (typeof gametypes === "undefined" ? 0 : 1);
+      this.gametype = (typeof gametypes === 'undefined' ? 0 : 1);
 
       // highscores
       this.highscores = new HighScores(this, title, gametypes);
       this.highscores.init(this.gametype);
     } catch (error) {
-      console.log("** ERROR ** lcdgame.js - onMetadataError: error loading json file");
+      console.log('** ERROR ** lcdgame.js - onMetadataError: error loading json file');
       console.error(error);
     }
   },
@@ -149,7 +136,7 @@ Game.prototype = {
   // -------------------------------------
   // start the specific game
   // -------------------------------------
-  initGame: async function(configfile, metadatafile) {
+  initGame: async function (configfile, metadatafile) {
     await this.loadConfig(configfile);
     await this.loadMetadata(metadatafile);
 
@@ -166,22 +153,22 @@ Game.prototype = {
 
     // bind input
     document.querySelectorAll(`.${BUTTON_CLASSNAME}`).forEach((element) => {
-      element.addEventListener("mousedown", this.onmousedown.bind(this), false);
-      element.addEventListener("mouseup", this.onmouseup.bind(this), false);
+      element.addEventListener('mousedown', this.onmousedown.bind(this), false);
+      element.addEventListener('mouseup', this.onmouseup.bind(this), false);
 
       if (isTouchDevice()) {
-        element.addEventListener("touchstart", this.ontouchstart.bind(this), false);
-        element.addEventListener("touchend", this.ontouchend.bind(this), false);
+        element.addEventListener('touchstart', this.ontouchstart.bind(this), false);
+        element.addEventListener('touchend', this.ontouchend.bind(this), false);
       }
     });
 
     // keyboard
-    document.addEventListener("keydown", this.onkeydown.bind(this), false);
-    document.addEventListener("keyup",   this.onkeyup.bind(this), false);
+    document.addEventListener('keydown', this.onkeydown.bind(this), false);
+    document.addEventListener('keyup', this.onkeyup.bind(this), false);
 
     displayInfobox();
 
-    console.log("lcdgame.js v" +  LCDGAME_VERSION + " :: start");
+    console.log('lcdgame.js v' + LCDGAME_VERSION + ' :: start');
   },
 
   // -------------------------------------
@@ -196,14 +183,13 @@ Game.prototype = {
    * @param {number} ms - Millisecond interval to execute this callback.
    * @param {boolean} waitfirst - Execute callback on registration or after first `ms` interval has passed.
    */
-  addtimer: function(context, callback, ms, waitfirst = true) {
-
+  addtimer: function (context, callback, ms, waitfirst = true) {
     // after .start() do instantly start callbacks (true), or wait the first time (false), so:
     // true  => .start() [callback] ..wait ms.. [callback] ..wait ms.. etc.
     // false => .start() ..wait ms.. [callback] ..wait ms.. [callback] etc.
 
     // add new timer object
-    var tim = new Timer(context, callback, ms, waitfirst);
+    const tim = new Timer(context, callback, ms, waitfirst);
 
     this.timers.push(tim);
 
@@ -215,9 +201,9 @@ Game.prototype = {
    *
    * @private
    */
-  cleartimers: function() {
+  cleartimers: function () {
     // clear all timers
-    for (var t=0; t < this.timers.length; t++) {
+    for (let t = 0; t < this.timers.length; t++) {
       this.timers[t].pause();
       this.timers[t] = null;
     }
@@ -230,16 +216,16 @@ Game.prototype = {
    * @private
    * @param {Number} timestamp - Date.now()
    */
-  updateLoop: function(timestamp) {
+  updateLoop: function (timestamp) {
     // check all timers
-    for (var t=0; t < this.timers.length; t++) {
+    for (let t = 0; t < this.timers.length; t++) {
       if (this.timers[t].enabled) {
         this.timers[t].update(timestamp);
       }
     }
   },
 
-  gameReset: function(gametype = this.gametype) {
+  gameReset: function (gametype = this.gametype) {
     // new game reset variables
     this.score = 0;
     this.level = 0;
@@ -280,7 +266,7 @@ Game.prototype = {
    * @param {string} filename - Name of Shape.
    * @param {boolean} value
    */
-  setShapeByName: function(name, value) {
+  setShapeByName: function (name, value) {
     const frame = this.frameMap.get(name);
     if (frame) {
       frame.value = value;
@@ -297,7 +283,7 @@ Game.prototype = {
    * @param {string} name
    * @param {boolean} [value=false]
    */
-  sequenceClear: function(name, value = false) {
+  sequenceClear: function (name, value = false) {
     const sequence = this.sequenceMap.get(name);
 
     sequence.frames.forEach(frameName => {
@@ -311,7 +297,7 @@ Game.prototype = {
    * @param {number} [max]
    * @returns {boolean}
    */
-  sequenceShift: function(name, max) {
+  sequenceShift: function (name, max) {
     // example start [0] [1] [.] [3] [.] (.=off)
     //        result [.] [1] [2] [.] [4]
 
@@ -319,20 +305,20 @@ Game.prototype = {
     const sequence = this.sequenceMap.get(name);
 
     // max position is optional
-    if (typeof max === "undefined") {
+    if (typeof max === 'undefined') {
       max = sequence.frames.length;
     }
 
     // shift shape values one place DOWN
-    var i;
-    var ret = false;
-    for (i = max-1; i > 0; i--) {
+    let i;
+    let ret = false;
+    for (i = max - 1; i > 0; i--) {
       // get shape indexes of adjacent shapes in this sequence
-      const frame1Name = sequence.frames[i-1];
+      const frame1Name = sequence.frames[i - 1];
       const frame2Name = sequence.frames[i];
 
       // return value
-      if (i == (max-1)) {
+      if (i === (max - 1)) {
         ret = this.frameMap.get(frame2Name).value;
       }
 
@@ -347,7 +333,7 @@ Game.prototype = {
     return ret;
   },
 
-  sequenceShiftReverse: function(name, min = 0) {
+  sequenceShiftReverse: function (name, min = 0) {
     // example start [.] [1] [.] [3] [4] (.=off)
     //        result [0] [.] [2] [3] [.]
 
@@ -355,17 +341,17 @@ Game.prototype = {
     const sequence = this.sequenceMap.get(name);
 
     // shift shape values one place UP
-    for (var i = min; i < sequence.frames.length-1; i++) {
+    for (var i = min; i < sequence.frames.length - 1; i++) {
       // get shape indexes of adjacent shapes in this sequence
       const frame1Name = sequence.frames[i];
-      const frame2Name = sequence.frames[i+1];
+      const frame2Name = sequence.frames[i + 1];
       const frame2 = this.frameMap.get(frame2Name);
 
       // shift shape values UP one place in sequence
       this.setShapeByName(frame1Name, frame2.value);
     }
     // set last value to blank; default value false
-    var shape1 = sequence.frames[i];
+    const shape1 = sequence.frames[i];
     this.setShapeByName(shape1, false);
   },
 
@@ -375,7 +361,7 @@ Game.prototype = {
    * @param {string} name - Sequence name.
    * @param {boolean} value - Frame visibility.
    */
-  sequenceSetFirst: function(name, value) {
+  sequenceSetFirst: function (name, value) {
     const sequence = this.sequenceMap.get(name);
     this.setShapeByName(sequence.frames[0], value);
   },
@@ -387,20 +373,20 @@ Game.prototype = {
    * @param {number} pos - Index of frame in sequence to toggle.
    * @param {boolean} value - Frame visibility.
    */
-  sequenceSetPos: function(name, pos, value) {
+  sequenceSetPos: function (name, pos, value) {
     if (this.sequenceMap.size > 0) {
       // get sequence
       const sequence = this.sequenceMap.get(name);
 
       // if pos is -1, then last last position
-      if (pos == -1) {
+      if (pos === -1) {
         pos = sequence.frames.length - 1;
       }
 
       // if pos out of bound of sequence array
       if (pos < sequence.frames.length - 1) {
         // set value for position shape in sequence
-        var frameName = sequence.frames[pos];
+        const frameName = sequence.frames[pos];
         this.setShapeByName(frameName, value);
       }
     }
@@ -412,7 +398,7 @@ Game.prototype = {
    * @param {string} name - Frame name.
    * @returns {boolean}
    */
-  shapeVisible: function(name) {
+  shapeVisible: function (name) {
     const frame = this.frameMap.get(name);
     return frame.value;
   },
@@ -424,31 +410,31 @@ Game.prototype = {
    * @param {number} [pos] - Optional index of frame to check.
    * @returns {boolean}
    */
-  sequenceShapeVisible: function(name, pos) {
+  sequenceShapeVisible: function (name, pos) {
     // get sequence
     const sequence = this.sequenceMap.get(name);
 
     // single pos or any pos
-    if (typeof pos === "undefined") {
+    if (typeof pos === 'undefined') {
       // no pos given, check if any shape visible
-      for (var i = 0; i < sequence.frames.length; i++) {
+      for (let i = 0; i < sequence.frames.length; i++) {
         // check if any shape is visible (value==true)
         const frameName = sequence.frames[i];
-        if (this.frameMap.get(frameName).value == true) {
+        if (this.frameMap.get(frameName).value === true) {
           return true;
         }
       }
     } else {
       // if pos is -1, then last last position
-      if (pos == -1) {
-        pos = sequence.frames.length-1;
+      if (pos === -1) {
+        pos = sequence.frames.length - 1;
       }
 
       // if pos out of bound of sequence array
       if (pos < sequence.frames.length) {
         // check if shape is visible (value==true)
         const frameName = sequence.frames[pos];
-        if (this.frameMap.get(frameName).value == true) {
+        if (this.frameMap.get(frameName).value === true) {
           return true;
         }
       }
@@ -463,15 +449,15 @@ Game.prototype = {
    * @param {boolean} value - Frame visibility.
    * @returns {boolean}
    */
-  sequenceAllVisible: function(name, value) {
+  sequenceAllVisible: function (name, value) {
     // get sequence
     const sequence = this.sequenceMap.get(name);
 
     // check if all visible same as value
-    for (var i = 0; i < sequence.frames.length; i++) {
+    for (let i = 0; i < sequence.frames.length; i++) {
       // check if all shapes same visible
-      var frameName = sequence.frames[i];
-      if (this.frameMap.get(frameName).value != value) {
+      const frameName = sequence.frames[i];
+      if (this.frameMap.get(frameName).value !== value) {
         return false;
       }
     }
@@ -495,7 +481,7 @@ Game.prototype = {
    * @param {string} str - value. e.g. score (200), time (12:34)
    * @param {boolean} [rightalign=false]
    */
-  digitsDisplay: function(name, str, rightalign = false) {
+  digitsDisplay: function (name, str, rightalign = false) {
     // not loaded yet
     if (this.digitMap.size === 0) {
       return;
@@ -503,8 +489,8 @@ Game.prototype = {
 
     const digitGroup = this.digitMap.get(name);
     if (!digitGroup) {
-      console.log("** ERROR ** digitsDisplay('"+name+"') - digits not found.");
-      throw "lcdgames.js - digitsDisplay, no digits with name '" + name + "'";
+      console.log("** ERROR ** digitsDisplay('" + name + "') - digits not found.");
+      throw new Error("lcdgames.js - digitsDisplay, no digits with name '" + name + "'");
     }
 
     const digitGroupLength = digitGroup.locations.length;
@@ -533,12 +519,11 @@ Game.prototype = {
    *
    * @param {Event} evt
    */
-  ontouchstart: function(evt) {
+  ontouchstart: function (evt) {
     evt.preventDefault();
 
     //  evt.changedTouches is changed touches in this event, not all touches at this moment
-    for (var i = 0; i < evt.changedTouches.length; i++)
-    {
+    for (let i = 0; i < evt.changedTouches.length; i++) {
       this.onmousedown(evt.changedTouches[i]);
     }
   },
@@ -548,12 +533,11 @@ Game.prototype = {
    *
    * @param {Event} evt
    */
-  ontouchend: function(evt) {
+  ontouchend: function (evt) {
     evt.preventDefault();
 
     //  evt.changedTouches is changed touches in this event, not all touches at this moment
-    for (var i = 0; i < evt.changedTouches.length; i++)
-    {
+    for (let i = 0; i < evt.changedTouches.length; i++) {
       this.onmouseup(evt.changedTouches[i]);
     }
   },
@@ -563,7 +547,7 @@ Game.prototype = {
    *
    * @param {Event} evt
    */
-  onmousedown: function(evt) {
+  onmousedown: function (evt) {
     const data = evt.currentTarget.dataset;
 
     this.onButtonDown(data.name);
@@ -574,7 +558,7 @@ Game.prototype = {
    *
    * @param {Event} evt
    */
-  onmouseup: function(evt) {
+  onmouseup: function (evt) {
     const data = evt.currentTarget.dataset;
 
     this.onButtonUp(data.name);
@@ -585,7 +569,7 @@ Game.prototype = {
    *
    * @param {Event} evt
    */
-  onkeydown: function(evt) {
+  onkeydown: function (evt) {
     const buttonName = this.keyMap[evt.key];
     if (buttonName) {
       this.onButtonDown(buttonName);
@@ -597,7 +581,7 @@ Game.prototype = {
    *
    * @param {Event} evt
    */
-  onkeyup: function(evt) {
+  onkeyup: function (evt) {
     const buttonName = this.keyMap[evt.key];
 
     if (buttonName) {
@@ -610,7 +594,7 @@ Game.prototype = {
    *
    * @param {string} name - name of button in gamedata.buttons Array.
    */
-  onButtonDown: function(name) {
+  onButtonDown: function (name) {
     // Update UI
     this.setShapeByName(name, true);
 
@@ -629,7 +613,7 @@ Game.prototype = {
    *
    * @param {string} name - name of button in gamedata.buttons Array.
    */
-  onButtonUp: function(name) {
+  onButtonUp: function (name) {
     // Update UI
     this.setShapeByName(name, false);
 

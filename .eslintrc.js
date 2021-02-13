@@ -6,20 +6,22 @@ module.exports = {
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
+    'eslint-config-standard'
   ],
   parser: '@typescript-eslint/parser',
   plugins: [
-    '@typescript-eslint',
+    '@typescript-eslint'
   ],
   parserOptions: {
-    project: "./tsconfig.json",
-    sourceType: "module",
+    project: './tsconfig.json',
+    sourceType: 'module'
   },
   rules: {
-    indent: ["error", 2, {
+    indent: ['error', 2, {
       SwitchCase: 1
     }],
-    "no-unused-vars": "warn",
-    semi: ["error", "always"]
+    'no-unused-expressions': 'warn',
+    'no-unused-vars': 'warn',
+    semi: ['error', 'always']
   }
 };
