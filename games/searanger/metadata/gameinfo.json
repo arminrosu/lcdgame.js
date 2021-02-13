@@ -1,22 +1,22 @@
 {
-	"gameinfo": {
-		"device": {
-			"title": "Sea Ranger",
-			"model": "",
-			"manufacturer": "Mini Arcade",
-			"releasedate": "1981",
-			"type": "LCD"
-		},
-		"simulation": {
-			"program": "Bas de Reuver",
-			"photoedit": "Bas de Reuver",
-			"deviceprovided": "Bas de Reuver"
-		},
-		"gametypes": [
-			"pro 1", "pro 2"
-		],
-		"instructions": {
-			"en": "Move left and right to avoid coconuts, boats, sharks and birds. When lifesaver drops down, move to the right to escape on the boat.\n\nStart the game by pressing [Mode],\nthen press [Game A/B] to select 'pro1' or 'pro2',\nthen press [Date / Start] to start the game.\nYou can also press keyboard cursors left and right to move."
-		}
-	}
+  "gameinfo": {
+    "device": {
+      "title": "Sea Ranger",
+      "model": "",
+      "manufacturer": "Mini Arcade",
+      "releasedate": "1981",
+      "type": "LCD"
+    },
+    "simulation": {
+      "program": "Bas de Reuver",
+      "photoedit": "Bas de Reuver",
+      "deviceprovided": "Bas de Reuver"
+    },
+    "gametypes": [
+      "pro 1", "pro 2"
+    ],
+    "instructions": {
+      "en": "Move left and right to avoid coconuts, boats, sharks and birds. When lifesaver drops down, move to the right to escape on the boat.\n\nStart the game by pressing [Mode],\nthen press [Game A/B] to select 'pro1' or 'pro2',\nthen press [Date / Start] to start the game.\nYou can also press keyboard cursors left and right to move."
+    }
+  }
 }

@@ -1,22 +1,22 @@
 {
-	"gameinfo": {
-		"device": {
-			"title": "Mariobros",
-			"model": "MW-56",
-			"manufacturer": "Nintendo",
-			"releasedate": "1983",
-			"type": "LCD"
-		},
-		"simulation": {
-			"program": "Bas de Reuver",
-			"photoedit": "Bas de Reuver",
-			"deviceprovided": "Bas de Reuver"
-		},
-		"gametypes": [
-			"game A", "game B"
-		],
-		"instructions": {
-			"en": "Move Mario and Luigi up and down the bottling factory to safely get the cases into the truck. Load eight cases onto the truck to complete the level. Don't drop any cases.\n\nStart the game by pressing [Game A] or [Game B].\nPress [Q]/[A] to move Luigi and [P]/[L] to move Mario."
-		}
-	}
+  "gameinfo": {
+    "device": {
+      "title": "Mariobros",
+      "model": "MW-56",
+      "manufacturer": "Nintendo",
+      "releasedate": "1983",
+      "type": "LCD"
+    },
+    "simulation": {
+      "program": "Bas de Reuver",
+      "photoedit": "Bas de Reuver",
+      "deviceprovided": "Bas de Reuver"
+    },
+    "gametypes": [
+      "game A", "game B"
+    ],
+    "instructions": {
+      "en": "Move Mario and Luigi up and down the bottling factory to safely get the cases into the truck. Load eight cases onto the truck to complete the level. Don't drop any cases.\n\nStart the game by pressing [Game A] or [Game B].\nPress [Q]/[A] to move Luigi and [P]/[L] to move Mario."
+    }
+  }
 }
