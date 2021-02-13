@@ -35,16 +35,14 @@ highway.ClockMode.prototype = {
 		this.demotimer.start();
 	},
 
-	update: function() {
-	},
-
 	press: function(btn) {
 		if (btn == "mode") {
 			this.lcdgame.state.start("select");
 		}
-	},
 
-	close: function() {
+		if (btn === "sound") {
+			this.lcdgame.setSoundMute();
+		}
 	},
 
 	onTimerDemo: function() {
@@ -163,6 +161,10 @@ highway.SelectMode.prototype = {
 		this.lcdgame.setShapeByName("game1", true);
 	},
 	press: function(btn) {
+		if (btn === "sound") {
+			this.lcdgame.setSoundMute();
+		}
+
 		// select difficulty 1 or 2 or back to demo mode
 		if (btn == "mode") {
 			if (this.selectdiff == 1) {
@@ -244,6 +246,10 @@ highway.MainGame.prototype = {
 	},
 
 	press: function(btn) {
+		if (btn === "sound") {
+			this.lcdgame.setSoundMute();
+		}
+
 		// determine state of gameplay
 		switch (this.gamestate) {
 			case STATE_GAMEPLAY:
@@ -284,14 +290,14 @@ highway.MainGame.prototype = {
 	},
 
 	onTimerWait: function() {
-		var d = new Date();
-		var n = d.toLocaleTimeString() + '.' + ("000"+d.getMilliseconds()).substr(-3);
 		// determine where to continue
 		switch (this.gamestate) {
 			case STATE_GAMEPICK:
 				// remove hitchhiker and put in car
 				this.lcdgame.sequenceShift("girl");
-				for (var i = 0; i < 5; i++) {this.lcdgame.sequenceShift("car");}
+				for (var i = 0; i < 5; i++) {
+					this.lcdgame.sequenceShift("car");
+				}
 				this.girlincar = true;
 				this.pushcountdown = 20;
 				// continue game
@@ -510,7 +516,9 @@ highway.MainGame.prototype = {
 			this.addScore(50);
 			this.hitchhikers++;
 			// girl get out
-			for (var i = 0; i < 5; i++) {this.lcdgame.sequenceShiftReverse("car");}
+			for (let i = 0; i < 5; i++) {
+				this.lcdgame.sequenceShiftReverse("car");
+			}
 			this.girlincar = false;
 			this.pushcountdown = 20;
 			this.lcdgame.setShapeByName("girl_dropoff", true);
@@ -536,7 +544,7 @@ highway.MainGame.prototype = {
 
 		// change of new road objects appearing
 		this.objfreqs = [10, 33, 33, 33, 10]; // 10%, 25% etc.
-		for (var i=0; i < this.objfreqs.length; i++) {
+		for (let i=0; i < this.objfreqs.length; i++) {
 			var o = this.lcdgame.randomInteger(1, 100);
 			if (o <= this.objfreqs[i]) {this.objfreqs[i]=1;} else {this.objfreqs[i]=0;} // 1=appears, 0=doesn't appear
 		}
@@ -678,6 +686,10 @@ highway.BonusGame.prototype = {
 	},
 
 	press: function(btn) {
+		if (btn === "sound") {
+			this.lcdgame.setSoundMute();
+		}
+
 		if (this.bonusstate == STATE_BONUSPLAY) {
 			// handle player input appropriately
 			if ( (btn == "left") || (btn == "right") ) {
