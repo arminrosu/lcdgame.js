@@ -1,4 +1,4 @@
-import { Button, ButtonType, DigitGroup, Frame, GameConfig } from "./@types";
+import { Button, ButtonType, DigitGroup, Frame, GameConfig, Sequence } from "./@types";
 
 export const BUTTON_CLASSNAME = 'svgButton';
 const SHAPE_CLASSNAME = 'svgShape';
@@ -21,10 +21,6 @@ function fetchImage(url:string):Promise<HTMLImageElement> {
 	});
 }
 
-function getButtonFrameNames(buttons:Button[]):string[] {
-	return buttons.map(button => button.frames).flat();
-}
-
 function getButtonDirection(name:string):string {
 	return name.substring(name.lastIndexOf('_') + 1);
 }
@@ -39,6 +35,10 @@ function getDigitFrameId(groupName:string, positionIndex:number|string, value:st
 
 function getDigitFrameNames(digits:DigitGroup[]):string[] {
 	return digits.map(digit => [...digit.frames, ...digit.locations]).flat();
+}
+
+function getFrameNames(list:(Button|Sequence)[]):string[] {
+	return list.map(listItem => listItem.frames).flat();
 }
 
 const framesMap:Map<string, Frame> = new Map();
@@ -109,7 +109,7 @@ function renderDigitGroups(config:GameConfig, spriteImage: HTMLImageElement):str
 	const map = getFramesMap(config.frames);
 
 	return config.digits.map(digitGroup => {
-		return digitGroup.locations.map((locationDigitName, locationIndex) => {
+		return `<g data-digit-group="${digitGroup.name}">` + digitGroup.locations.map((locationDigitName, locationIndex) => {
 			const locationFrame = map.get(locationDigitName);
 
 			if (!locationFrame) {
@@ -133,8 +133,8 @@ function renderDigitGroups(config:GameConfig, spriteImage: HTMLImageElement):str
 					'transform': `translate(${locationFrame.spriteSourceSize.x - digitFrame.frame.x},${locationFrame.spriteSourceSize.y - digitFrame.frame.y})`,
 				});
 			});
-		});
-	}).flat(3).join('\n');
+		}).flat(2).join('\n') + '</g>';
+	}).join('\n');
 }
 
 function renderHitBox(frame:Frame, type:ButtonType):string {
@@ -194,12 +194,37 @@ function renderImage(frame: Frame, spriteImage: HTMLImageElement, attributes = {
 	return `<image ${renderAttributes(attr)} />`;
 }
 
+function renderSequenceFrame(config:GameConfig, frameName: string, spriteImage: HTMLImageElement):string {
+	const map = getFramesMap(config.frames);
+
+	const frame = map.get(frameName);
+	if (!frame) {
+		return '';
+	}
+
+	return renderImage(frame, spriteImage, {
+		id: getFrameId(frame.filename),
+		class: SHAPE_CLASSNAME
+	});
+}
+
+function renderSequences(config:GameConfig, spriteImage: HTMLImageElement):string {
+	return config.sequences.map(sequence => {
+		return `
+			<g data-sequence-name="${sequence.name}">
+				${sequence.frames.map(frameName => renderSequenceFrame(config, frameName, spriteImage)).join('\n')}
+			</g>
+		`;
+	}).join('\n');
+}
+
 async function render(config:GameConfig):Promise<string> {
 	const backgroundImage = await fetchImage(config.imgback);
 	const spriteImage = await fetchImage(config.imgshapes);
 
-	const buttonFrameNames = getButtonFrameNames(config.buttons);
+	const buttonFrameNames = getFrameNames(config.buttons);
 	const digitaFrameNames = getDigitFrameNames(config.digits);
+	const sequenceFrameNames = getFrameNames(config.sequences);
 
 	const buttons:Frame[] = [];
 	const images:Frame[] = [];
@@ -208,7 +233,7 @@ async function render(config:GameConfig):Promise<string> {
 		const { filename } = frame;
 		if (buttonFrameNames.includes(filename)) {
 			buttons.push(frame);
-		} else if (!digitaFrameNames.includes(filename)) {
+		} else if (!digitaFrameNames.includes(filename) && !sequenceFrameNames.includes(filename)) {
 			images.push(frame);
 		}
 	});
@@ -222,6 +247,7 @@ async function render(config:GameConfig):Promise<string> {
 			${images.map((frame) => renderImage(frame, spriteImage, { id: getFrameId(frame.filename), class: SHAPE_CLASSNAME })).join('')}
 			${renderButtons(buttons, spriteImage, config.buttons)}
 			${renderDigitGroups(config, spriteImage)}
+			${renderSequences(config, spriteImage)}
 		</svg>
 	`;
 

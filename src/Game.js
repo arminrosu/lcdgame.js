@@ -60,6 +60,9 @@ const Game = function (configfile, metadatafile = "metadata/gameinfo.json") {
 	this.state = new StateManager(this);
 
 	this.digitMap = new Map();
+	this.frameMap = new Map();
+	this.sequenceMap = new Map();
+
 	// @NOTE: change this object to add / remove custom key bindings
 	this.keyMap = {};
 	this.timers = [];
@@ -94,28 +97,21 @@ Game.prototype = {
 		await addSVG(data);
 
 		// add custom lcdgame.js properties for use throughout the library
-		for (var i = 0; i < this.gamedata.frames.length; i++) {
-
-			// add current/previous values to all shape objects
-			this.gamedata.frames[i].value = false;
-			this.gamedata.frames[i].valprev = false;
-
-			// add type
-			this.gamedata.frames[i].type = "shape";
-		}
+		data.frames.forEach(frame => {
+			this.frameMap.set(frame.filename, {
+				...frame,
+				// add current/previous values to all shape objects
+				value: false,
+				valprev: false,
+				// add type
+				type: "shape",
+			});
+		});
 
 		// prepare sequences
-		for (var s = 0; s < this.gamedata.sequences.length; s++) {
-			// shape indexes
-			this.gamedata.sequences[s].ids = [];
-
-			// find all frames indexes
-			for (var f = 0; f < this.gamedata.sequences[s].frames.length; f++) {
-				var filename = this.gamedata.sequences[s].frames[f];
-				var idx = this.shapeIndexByName(filename);
-				this.gamedata.sequences[s].ids.push(idx);
-			}
-		}
+		data.sequences.forEach(sequence => {
+			this.sequenceMap.set(sequence.name, sequence);
+		});
 
 		// prepare digits
 		for (var d = 0; d < this.gamedata.digits.length; d++) {
@@ -277,67 +273,24 @@ Game.prototype = {
 	// -------------------------------------
 	// function for shapes
 	// -------------------------------------
-	/**
-	 * Get index of Shape by it's name.
-	 *
-	 * @private
-	 * @param {string} name
-	 * @returns {number}
-	 */
-	shapeIndexByName: function(name) {
-		for (var i = 0; i < this.gamedata.frames.length; i++) {
-			if (this.gamedata.frames[i].filename == name)
-				return i;
-		}
-		console.log("** ERROR ** shapeIndexByName('"+name+"') - filename not found.");
-		// if not found return -1
-		throw "lcdgames.js - "+arguments.callee.caller.toString()+", no frame with filename '" + name + "'";
-	},
 
 	/**
 	 * Toggle shape visibility by its name.
 	 *
-	 * @param {[string | number ]} filename - index or name of Shape.
+	 * @param {string} filename - Name of Shape.
 	 * @param {boolean} value
 	 */
-	setShapeByName: function(filename, value) {
-		let name = filename;
-		let frame;
-		// Some code still uses indexes. Kept for compatibility.
-		if (typeof filename === 'number') {
-			frame = this.gamedata.frames[filename];
-			name = frame.filename;
-		} else {
-			frame = this.gamedata.frames.find(f => f.filename === filename);
-		}
+	setShapeByName: function(name, value) {
+		const frame = this.frameMap.get(name);
 		if (frame) {
 			frame.value = value;
+			setShapeVisibility(name, value);
 		}
-		setShapeVisibility(name, value);
 	},
 
 	// -------------------------------------
 	// function for sequences
 	// -------------------------------------
-	/**
-	 * Get index of sequence by name.
-	 *
-	 * @private
-	 * @param {string} name
-	 * @returns {number}
-	 */
-	sequenceIndexByName: function(name) {
-		if (this.gamedata.sequences) {
-			for (var i = 0; i < this.gamedata.sequences.length; i++) {
-				if (this.gamedata.sequences[i].name == name)
-					return i;
-			}
-			console.log("** ERROR ** sequenceIndexByName('"+name+"') - sequence name not found.");
-			// if not found return -1
-			throw "lcdgames.js - "+arguments.callee.caller.toString()+", no sequence with name '" + name + "'";
-		}
-		return -1;
-	},
 
 	/**
 	 *
@@ -345,10 +298,9 @@ Game.prototype = {
 	 * @param {boolean} [value=false]
 	 */
 	sequenceClear: function(name, value = false) {
-		// get sequence index of name
-		var seqidx = this.sequenceIndexByName(name);
+		const sequence = this.sequenceMap.get(name);
 
-		this.gamedata.sequences[seqidx].frames.forEach(frameName => {
+		sequence.frames.forEach(frameName => {
 			this.setShapeByName(frameName, value);
 		});
 	},
@@ -364,30 +316,32 @@ Game.prototype = {
 		//        result [.] [1] [2] [.] [4]
 
 		// get sequence index of name
-		var seqidx = this.sequenceIndexByName(name);
+		const sequence = this.sequenceMap.get(name);
 
 		// max position is optional
-		if (typeof max === "undefined") max = this.gamedata.sequences[seqidx].ids.length;
+		if (typeof max === "undefined") {
+			max = sequence.frames.length;
+		}
 
 		// shift shape values one place DOWN
 		var i;
 		var ret = false;
 		for (i = max-1; i > 0; i--) {
 			// get shape indexes of adjacent shapes in this sequence
-			const shape1 = this.gamedata.sequences[seqidx].ids[i-1];
-			const shape2 = this.gamedata.sequences[seqidx].ids[i];
+			const frame1Name = sequence.frames[i-1];
+			const frame2Name = sequence.frames[i];
 
 			// return value
 			if (i == (max-1)) {
-				ret = this.gamedata.frames[shape2].value;
+				ret = this.frameMap.get(frame2Name).value;
 			}
 
 			// shift shape values DOWN one place in sequence
-			this.setShapeByName(this.gamedata.frames[shape2].filename, this.gamedata.frames[shape1].value);
+			this.setShapeByName(this.frameMap.get(frame2Name).filename, this.frameMap.get(frame1Name).value);
 		}
 		// set first value to blank; default value false
-		var shape1 = this.gamedata.sequences[seqidx].ids[0];
-		this.setShapeByName(this.gamedata.frames[shape1].filename, false);
+		const frame1Name = sequence.frames[0];
+		this.setShapeByName(this.frameMap.get(frame1Name).filename, false);
 
 		// return value, was the last value that was "shifted-out" true or false
 		return ret;
@@ -398,56 +352,56 @@ Game.prototype = {
 		//        result [0] [.] [2] [3] [.]
 
 		// get sequence index of name
-		var seqidx = this.sequenceIndexByName(name);
+		const sequence = this.sequenceMap.get(name);
 
 		// shift shape values one place UP
-		var i;
-		for (i = min; i < this.gamedata.sequences[seqidx].ids.length-1; i++) {
+		for (var i = min; i < sequence.frames.length-1; i++) {
 			// get shape indexes of adjacent shapes in this sequence
-			const shape1 = this.gamedata.sequences[seqidx].ids[i];
-			const shape2 = this.gamedata.sequences[seqidx].ids[i+1];
+			const frame1Name = sequence.frames[i];
+			const frame2Name = sequence.frames[i+1];
+			const frame2 = this.frameMap.get(frame2Name);
+
 			// shift shape values UP one place in sequence
-			this.setShapeByName(this.gamedata.frames[shape1].filename, this.gamedata.frames[shape2].value);
+			this.setShapeByName(frame1Name, frame2.value);
 		}
 		// set last value to blank; default value false
-		var shape1 = this.gamedata.sequences[seqidx].ids[i];
-		this.setShapeByName(this.gamedata.frames[shape1].filename, false);
+		var shape1 = sequence.frames[i];
+		this.setShapeByName(shape1, false);
 	},
 
 	/**
+	 * Show/Hide first frame in sequence.
 	 *
-	 * @param {string} name
-	 * @param {boolean} value
+	 * @param {string} name - Sequence name.
+	 * @param {boolean} value - Frame visibility.
 	 */
 	sequenceSetFirst: function(name, value) {
-		// get sequence
-		var seqidx = this.sequenceIndexByName(name);
-
-		// set value for first shape in sequence
-		var shape1 = this.gamedata.sequences[seqidx].ids[0];
-		this.setShapeByName(this.gamedata.frames[shape1].filename, value);
+		const sequence = this.sequenceMap.get(name);
+		this.setShapeByName(sequence.frames[0], value);
 	},
 
 	/**
-	 * Set position of Sequence.
+	 * Toggle visibility of nth element in sequence.
 	 *
-	 * @param {string} name
-	 * @param {number} pos
-	 * @param {boolean} value
+	 * @param {string} name - Sequence name.
+	 * @param {number} pos - Index of frame in sequence to toggle.
+	 * @param {boolean} value - Frame visibility.
 	 */
 	sequenceSetPos: function(name, pos, value) {
-		if (this.gamedata.sequences) {
+		if (this.sequenceMap.size > 0) {
 			// get sequence
-			var seqidx = this.sequenceIndexByName(name);
+			const sequence = this.sequenceMap.get(name);
 
 			// if pos is -1, then last last position
-			if (pos == -1) {pos = this.gamedata.sequences[seqidx].ids.length-1;}
+			if (pos == -1) {
+				pos = sequence.frames.length - 1;
+			}
 
 			// if pos out of bound of sequence array
-			if (pos < this.gamedata.sequences[seqidx].ids.length) {
+			if (pos < sequence.frames.length - 1) {
 				// set value for position shape in sequence
-				var shape1 = this.gamedata.sequences[seqidx].ids[pos];
-				this.setShapeByName(shape1, value);
+				var frameName = sequence.frames[pos];
+				this.setShapeByName(frameName, value);
 			}
 		}
 	},
@@ -455,51 +409,46 @@ Game.prototype = {
 	/**
 	 * Check if a Frame is visible.
 	 *
-	 * @param {string} name
+	 * @param {string} name - Frame name.
 	 * @returns {boolean}
 	 */
 	shapeVisible: function(name) {
-		// find shape
-		for (var i = 0; i < this.gamedata.frames.length; i++) {
-			if (this.gamedata.frames[i].filename == name) {
-				if (this.gamedata.frames[i].value == true) {
-					return true;
-				}
-			}
-		}
-		return false;
+		const frame = this.frameMap.get(name);
+		return frame.value;
 	},
 
 	/**
-	 * Check if a Sequence is visible.
+	 * Check if a sequence has visible frames.
 	 *
-	 * @param {string} name
-	 * @param {number} pos
+	 * @param {string} name - Sequence name.
+	 * @param {number} [pos] - Optional index of frame to check.
 	 * @returns {boolean}
 	 */
 	sequenceShapeVisible: function(name, pos) {
 		// get sequence
-		var seqidx = this.sequenceIndexByName(name);
+		const sequence = this.sequenceMap.get(name);
 
 		// single pos or any pos
 		if (typeof pos === "undefined") {
 			// no pos given, check if any shape visible
-			for (var i = 0; i < this.gamedata.sequences[seqidx].ids.length; i++) {
+			for (var i = 0; i < sequence.frames.length; i++) {
 				// check if any shape is visible (value==true)
-				const shape1 = this.gamedata.sequences[seqidx].ids[i];
-				if (this.gamedata.frames[shape1].value == true) {
+				const frameName = sequence.frames[i];
+				if (this.frameMap.get(frameName).value == true) {
 					return true;
 				}
 			}
 		} else {
 			// if pos is -1, then last last position
-			if (pos == -1) {pos = this.gamedata.sequences[seqidx].ids.length-1;}
+			if (pos == -1) {
+				pos = sequence.frames.length-1;
+			}
 
 			// if pos out of bound of sequence array
-			if (pos < this.gamedata.sequences[seqidx].ids.length) {
+			if (pos < sequence.frames.length) {
 				// check if shape is visible (value==true)
-				const shape1 = this.gamedata.sequences[seqidx].ids[pos];
-				if (this.gamedata.frames[shape1].value == true) {
+				const frameName = sequence.frames[pos];
+				if (this.frameMap.get(frameName).value == true) {
 					return true;
 				}
 			}
@@ -508,21 +457,21 @@ Game.prototype = {
 	},
 
 	/**
-	 * Check if all Frames of a Sequence are visible.
+	 * Check if all frames of a sequence are visible or hidden.
 	 *
-	 * @param {string} name
-	 * @param {boolean} value
+	 * @param {string} name - Sequence name.
+	 * @param {boolean} value - Frame visibility.
 	 * @returns {boolean}
 	 */
 	sequenceAllVisible: function(name, value) {
 		// get sequence
-		var seqidx = this.sequenceIndexByName(name);
+		const sequence = this.sequenceMap.get(name);
 
 		// check if all visible same as value
-		for (var i = 0; i < this.gamedata.sequences[seqidx].ids.length; i++) {
+		for (var i = 0; i < sequence.frames.length; i++) {
 			// check if all shapes same visible
-			var shape1 = this.gamedata.sequences[seqidx].ids[i];
-			if (this.gamedata.frames[shape1].value != value) {
+			var frameName = sequence.frames[i];
+			if (this.frameMap.get(frameName).value != value) {
 				return false;
 			}
 		}
